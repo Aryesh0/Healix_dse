@@ -46,15 +46,8 @@ const LoginPage = () => {
         login(payload.token, { username: payload.username, role: payload.role, linkedId: payload.linkedId });
       }
     } catch (err) {
-      console.log("Mocking login for DSA sandbox...");
-      if (!selectedRole) {
-        setError('Please select a role to sign in as during the demo.');
-        return;
-      }
-      login('mock_token_456', { 
-         username: credentials.username || 'DemoUser', 
-         role: selectedRole 
-      });
+      const message = err?.response?.data?.detail || 'Login failed. Please check your credentials.';
+      setError(message);
     } finally {
       setLoading(false);
     }

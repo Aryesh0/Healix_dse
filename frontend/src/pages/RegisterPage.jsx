@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import api from '../api/axios';
 import { AuthContext } from '../context/AuthContext';
-import { DatabaseContext } from '../context/DatabaseContext';
 
 const roles = [
   {
@@ -56,51 +55,23 @@ const RegisterPage = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const { login } = useContext(AuthContext); // Added access to login
-  const { db, sync } = useContext(DatabaseContext);
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     
-    // Add Doctor to DB Context automatically during MOCK
-    const addDoctorToDb = () => {
-       if (role === 'DOCTOR' && formData.specialization) {
-          const docName = `Dr. ${formData.username || formData.fullName}`;
-          const exists = db.doctorsMap.find(d => d.name === docName);
-          if (!exists) {
-            db.doctorsMap.push({ 
-                id: `D${Math.floor(Math.random()*1000)}`, 
-                name: docName, 
-                specialty: formData.specialization, 
-                phone: formData.phone,
-                email: formData.email,
-                days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], 
-                hours: '09:00 - 17:00' 
-            });
-            sync();
-          }
-       }
-    };
-
     try {
       const payload = { ...formData, role };
       const response = await api.post('/auth/register', payload);
       if (response.data.success) {
-        addDoctorToDb();
-        login(response.data.data?.token || 'mock_token', { 
-           username: formData.username || formData.fullName, 
-           role: role 
-        });
+        const data = response.data.data;
+        login(data.token, { username: data.username, role: data.role, linkedId: data.linkedId });
       }
     } catch (err) {
-      console.log("Auto-mocking registration for DSA demo since backend is unavailable");
-      addDoctorToDb();
-      login('mock_token_123', { 
-         username: formData.username || formData.fullName, 
-         role: role 
-      });
+      const message = err?.response?.data?.detail || 'Registration failed. Please try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }

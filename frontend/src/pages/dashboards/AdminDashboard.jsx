@@ -3,19 +3,38 @@ import { AuthContext } from '../../context/AuthContext';
 import { DatabaseContext } from '../../context/DatabaseContext';
 import { Users, CalendarCheck, BedDouble, Receipt, TrendingUp, ArrowRight, LayoutGrid } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../../api/axios';
 
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
   const { db } = useContext(DatabaseContext);
   
-  const allPatients = db.patients.getAll(); // O(N) Inorder Traversal - BST Exp 6
-  const availableBeds = db.beds.count;      // O(1) LL count - Singly Linked List Exp 5
+  const [allPatients, setAllPatients] = useState([]);
+  const [availableBeds, setAvailableBeds] = useState(0);
   const logs = db.logs.display();           // Stack Traversal - LIFO Exp 2
+  const [dataError, setDataError] = useState('');
   
   const [greeting, setGreeting] = useState('');
   useEffect(() => {
     const h = new Date().getHours();
     setGreeting(h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening');
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setDataError('');
+      try {
+        const [patientsRes, bedsRes] = await Promise.all([
+          api.get('/patients'),
+          api.get('/beds/summary')
+        ]);
+        setAllPatients(patientsRes.data.data || []);
+        setAvailableBeds(bedsRes.data.data?.available || 0);
+      } catch (e) {
+        setDataError('Live stats unavailable. Please ensure you are logged in.');
+      }
+    };
+    fetchStats();
   }, []);
 
   const stats = [
@@ -39,6 +58,11 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
+      {dataError && (
+        <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
+          {dataError}
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, idx) => (
           <div key={idx} className={`bg-gradient-to-br ${stat.bg} rounded-2xl p-5 border border-white/80 shadow-sm`}>

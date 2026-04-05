@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api', // Spring Boot default
+  baseURL: 'http://localhost:8000/api', // Python FastAPI backend
 });
 
 // Request interceptor to attach JWT token

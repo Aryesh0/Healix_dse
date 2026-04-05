@@ -7,7 +7,7 @@ Healix is a full-stack Hospital Management System (HMS) built with a modern arch
 | Layer     | Technology               |
 |-----------|--------------------------|
 | Frontend  | React 18, Vite 5, React Router, Tailwind-style Vanilla CSS Variables |
-| Backend   | Spring Boot 3.2.4 (Java 17), Spring Security, JJWT |
+| Backend   | Python 3.11+, FastAPI, Motor (MongoDB), JWT |
 | Database  | MongoDB (`healix_db`) |
 | ORM       | Spring Data MongoDB      |
 
@@ -18,10 +18,9 @@ Healix is a full-stack Hospital Management System (HMS) built with a modern arch
 Follow these terminal instructions to get the complete system running on your local machine.
 
 ### Prerequisites
-1. **Java 17+** Installed
-2. **Maven 3.8+** Installed
-3. **Node.js 18+** Installed
-4. **MongoDB** installed and running locally on port `27017`
+1. **Python 3.11+** Installed
+2. **Node.js 18+** Installed
+3. **MongoDB** installed and running locally on port `27017`
 
 ---
 
@@ -34,20 +33,20 @@ net start MongoDB
 
 ---
 
-### Step 2: Start the Java Backend
-Open a new terminal window, navigate to the `backend` directory, and start Spring Boot via Maven.
+### Step 2: Start the Python Backend
+Open a new terminal window, navigate to the `backend` directory, install dependencies, and start FastAPI.
 
 ```bash
 # 1. Navigate to the backend directory
 cd backend
 
-# 2. Clean and compile the application
-mvn clean compile
+# 2. Install Python dependencies
+pip install -r requirements.txt
 
-# 3. Run the Spring Boot server
-mvn spring-boot:run
+# 3. Run the FastAPI server
+uvicorn main:app --reload --port 8000
 ```
-> The backend API will start on **http://localhost:8080**
+> The backend API will start on **http://localhost:8000**
 
 ---
 
